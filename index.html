@@ -1208,12 +1208,16 @@ body {
 <aside id="sidebar" role="navigation" aria-label="BrainyBot Sidebar">
 
   <!-- Logo -->
+<!-- Logo -->
   <div class="sidebar-logo">
     <div class="logo-orb">🧠</div>
-    <div>
+    <div style="flex:1">
       <div class="logo-text">BrainyBot</div>
       <div class="logo-tagline">AI Study Companion</div>
     </div>
+    <button id="pwa-install-btn" onclick="triggerInstall()" title="Install App" aria-label="Install BrainyBot" style="display:none;background:linear-gradient(135deg,var(--accent-blue),#1a4a8a);border:none;border-radius:var(--radius-md);padding:7px 9px;cursor:pointer;color:#fff;flex-shrink:0;box-shadow:var(--shadow-sm);transition:all var(--transition)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
   </div>
 
   <!-- New Chat -->
@@ -2712,6 +2716,25 @@ document.addEventListener('keydown', (e) => {
   link.rel = 'manifest'; link.href = url;
   document.head.appendChild(link);
 })();
+// PWA Install prompt capture
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'none';
+  toast('BrainyBot installed! 🎉');
+});
+function triggerInstall() {
+  if (!deferredInstallPrompt) { toast('Open in Chrome/Edge browser to install'); return; }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+}
 
 console.log('%c🧠 BrainyBot ready!', 'color:#2B6CB0;font-size:16px;font-weight:bold');
 </script>
